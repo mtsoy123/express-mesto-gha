@@ -12,6 +12,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 
 const userRouting = require('./routes/user');
 
-app.post('/users', userRouting);
+app.use('/users', userRouting);
 
 app.listen(PORT, 'localhost');
