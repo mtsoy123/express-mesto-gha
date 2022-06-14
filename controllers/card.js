@@ -1,9 +1,10 @@
 const Card = require('../models/card');
+const { errorHandler } = require('../errorHandler/errorHandler');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => errorHandler(res, err));
 };
 
 module.exports.createCard = (req, res) => {
@@ -11,13 +12,13 @@ module.exports.createCard = (req, res) => {
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => errorHandler(res, err));
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => errorHandler(res, err));
 };
 
 module.exports.likeCard = (req, res) => {
@@ -27,7 +28,7 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => errorHandler(res, err));
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -37,5 +38,5 @@ module.exports.dislikeCard = (req, res) => {
     { new: true },
   )
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => errorHandler(res, err));
 };

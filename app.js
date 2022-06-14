@@ -20,16 +20,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post('/users', userRouter);
-app.get('/users', userRouter);
-app.get('/users/:id', userRouter);
-app.patch('/users/me', userRouter);
-app.patch('/users/me/avatar', userRouter);
-
-app.post('/cards', cardRouter);
-app.get('/cards', cardRouter);
-app.delete('/cards/:id', cardRouter);
-app.put('/cards/:id/likes', cardRouter);
-app.delete('/cards/:id/likes', cardRouter);
+app.use('/users', userRouter);
+app.use('/cards', cardRouter);
 
 app.listen(PORT, 'localhost');
