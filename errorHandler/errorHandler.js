@@ -9,9 +9,9 @@ module.exports.errorHandler = (res, err) => {
   }
 
   if (err.name === 'CastError') {
-    res.status(NOT_FOUND).send({ message: 'Запрашиваемые данные не найдены' });
+    res.status(NOT_FOUND).send({ asd: err.name, qwe: res.status, message: 'Запрашиваемые данные не найдены' });
     return;
   }
 
-  res.status(INTERNAL_SERVER_ERROR).send({ message: `Произошла неизвестная ошибка ${err.name}: ${err.message}` });
+  res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка' });
 };
