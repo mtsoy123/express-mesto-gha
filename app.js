@@ -6,6 +6,7 @@ const cardRouter = require('./routes/card');
 
 const app = express();
 const { PORT = 3000 } = process.env;
+const NOT_FOUND = 404;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -22,5 +23,7 @@ app.use((req, res, next) => {
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
-
+app.use((req, res) => {
+  res.status(NOT_FOUND).send({ message: 'Запрашиваемая страница не найдена.' });
+});
 app.listen(PORT, 'localhost');
