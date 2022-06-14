@@ -3,12 +3,12 @@ const NOT_FOUND = 404;
 const INTERNAL_SERVER_ERROR = 500;
 
 module.exports.errorHandler = (res, err) => {
-  if (err.name === 'ValidationError') {
+  if (err.name === 'ValidationError' || err.name === 'TypeError') {
     res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
     return;
   }
 
-  if (err.name === 'CastError' || err.name === 'TypeError') {
+  if (err.name === 'CastError') {
     res.status(NOT_FOUND).send({ message: 'Запрашиваемые данные не найдены' });
     return;
   }
