@@ -23,9 +23,10 @@ app.use((req, res, next) => {
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
-app.use((req, res) => {
+// todo refactor below
+/* app.use((req, res) => {
   const err = new Error('CastError');
   err.name = 'CastError';
   errorHandler(res, err);
-});
+}); */
 app.listen(PORT, 'localhost');

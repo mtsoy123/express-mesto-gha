@@ -1,5 +1,4 @@
 const User = require('../models/user');
-const { errorHandler } = require('../errorHandler/errorHandler');
 
 const opts = { runValidators: true };
 
@@ -11,33 +10,58 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
-    .orFail((err) => errorHandler(res, err))
     .then((user) => res.send({
       name: user.name,
       about: user.about,
       avatar: user.avatar,
       _id: user._id,
     }))
-    .catch((err) => errorHandler(res, err));
+    .catch((err) => {
+      if (err.name === 'TypeError') {
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+        return;
+      }
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Указан некорректный _id.' });
+        return;
+      }
+      res.status(500).send({ message: 'Произошла неизвестная ошибка.' });
+    });
 };
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
-    .catch((err) => errorHandler(res, err));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные.' });
+        return;
+      }
+      res.status(500).send({ message: 'Произошла неизвестная ошибка.' });
+    });
 };
 
 module.exports.updateUserInfo = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, opts)
     .then((user) => res.send({
-      name,
-      about,
+      name: req.name,
+      about: req.about,
       avatar: user.avatar,
       _id: user._id,
     }))
-    .catch((err) => errorHandler(res, err));
+    .catch((err) => {
+      if (err.name === 'TypeError') {
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+        return;
+      }
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные.' });
+        return;
+      }
+      res.status(500).send({ message: 'Произошла неизвестная ошибка.' });
+    });
 };
 
 module.exports.updateUserAvatar = (req, res) => {
@@ -46,8 +70,18 @@ module.exports.updateUserAvatar = (req, res) => {
     .then((user) => res.send({
       name: user.name,
       about: user.about,
-      avatar,
+      avatar: req.avatar,
       _id: user._id,
     }))
-    .catch((err) => errorHandler(res, err));
+    .catch((err) => {
+      if (err.name === 'TypeError') {
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+        return;
+      }
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+        return;
+      }
+      res.status(500).send({ message: 'Произошла неизвестная ошибка.' });
+    });
 };
