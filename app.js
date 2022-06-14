@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
+const { errorHandler } = require('./errorHandler/errorHandler');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -22,5 +23,9 @@ app.use((req, res, next) => {
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
-
+app.use((req, res) => {
+  const err = new Error('CastError');
+  err.name = 'CastError';
+  errorHandler(res, err);
+});
 app.listen(PORT, 'localhost');
