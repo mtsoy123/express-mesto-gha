@@ -28,6 +28,7 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
+    .orFail(() => { res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' }); })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ReferenceError') {
