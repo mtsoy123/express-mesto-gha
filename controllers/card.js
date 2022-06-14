@@ -1,11 +1,14 @@
 const Card = require('../models/card');
-const { errorHandler } = require('../errorHandler/errorHandler');
+
+const BAD_REQUEST = 400;
+const NOT_FOUND = 404;
+const INTERNAL_SERVER_ERROR = 500;
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
     .catch(() => {
-      res.status(500).send({ message: 'Произошла неизвестная ошибка.' });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
     });
 };
 
@@ -16,23 +19,26 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные.' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
       }
-      res.status(500).send({ message: 'Произошла неизвестная ошибка.' });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
     });
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
-    .orFail((err) => errorHandler(res, err))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Карточка по указанному _id не найдена.' });
+      if (err.name === 'ReferenceError') {
+        res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
         return;
       }
-      res.status(500).send({ message: 'Произошла неизвестная ошибка.' });
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Карточка по указанному _id не найдена.' });
+        return;
+      }
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
     });
 };
 
@@ -41,18 +47,17 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   { $addToSet: { likes: req.user._id } },
   { new: true, runValidators: true },
 )
-  .orFail((err) => errorHandler(res, err))
   .then((card) => res.send({ data: card }))
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Карточка по указанному _id не найдена.' });
+      res.status(BAD_REQUEST).send({ message: 'Карточка по указанному _id не найдена.' });
       return;
     }
     if (err.name === 'TypeError') {
-      res.status(404).send({ message: 'Карточка по указанному _id не найдена.' });
+      res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
       return;
     }
-    res.status(500).send({ message: 'Произошла неизвестная ошибка.' });
+    res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
   });
 
 module.exports.dislikeCard = (req, res) => {
@@ -61,17 +66,16 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
-    .orFail((err) => errorHandler(res, err))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Карточка по указанному _id не найдена.' });
+        res.status(BAD_REQUEST).send({ message: 'Карточка по указанному _id не найдена.' });
         return;
       }
       if (err.name === 'TypeError') {
-        res.status(404).send({ message: 'Карточка по указанному _id не найдена.' });
+        res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
         return;
       }
-      res.status(500).send({ message: 'Произошла неизвестная ошибка.' });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
     });
 };

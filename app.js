@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
-const { errorHandler } = require('./errorHandler/errorHandler');
 
 const app = express();
 const { PORT = 3000 } = process.env;
+const NOT_FOUND = 404;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,10 +23,7 @@ app.use((req, res, next) => {
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
-// todo refactor below
-/* app.use((req, res) => {
-  const err = new Error('CastError');
-  err.name = 'CastError';
-  errorHandler(res, err);
-}); */
+app.use((req, res) => {
+  res.status(NOT_FOUND).send({ message: 'Запрашиваемая страница не найдена.' });
+});
 app.listen(PORT, 'localhost');
