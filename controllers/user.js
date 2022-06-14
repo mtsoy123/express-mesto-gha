@@ -1,6 +1,8 @@
 const User = require('../models/user');
 const { errorHandler } = require('../errorHandler/errorHandler');
 
+const opts = { runValidators: true };
+
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
@@ -27,14 +29,19 @@ module.exports.createUser = (req, res) => {
 
 module.exports.updateUserInfo = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about })
-    .then((user) => res.send({ data: user }))
+  User.findByIdAndUpdate(req.user._id, { name, about }, opts)
+    .then((user) => res.send({
+      name,
+      about,
+      avatar: user.avatar,
+      _id: user._id,
+    }))
     .catch((err) => errorHandler(res, err));
 };
 
 module.exports.updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar })
+  User.findByIdAndUpdate(req.user._id, { avatar }, opts)
     .then((user) => res.send({ data: user }))
     .catch((err) => errorHandler(res, err));
 };
