@@ -13,6 +13,5 @@ router.delete('/:id', deleteCard);
 router.put('/:id/likes', likeCard);
 
 router.delete('/:id/likes', dislikeCard);
-// router.get('/cards/:id', (req, res) => res.send('qwe'));
 
 module.exports = router;
