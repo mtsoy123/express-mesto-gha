@@ -9,7 +9,7 @@ module.exports.errorHandler = (res, err) => {
   }
 
   if (err.name === 'CastError') {
-    res.status(NOT_FOUND).send({ asd: err.name, qwe: res.status, message: 'Запрашиваемые данные не найдены' });
+    res.status(NOT_FOUND).send({ message: 'Запрашиваемые данные не найдены' });
     return;
   }
 
