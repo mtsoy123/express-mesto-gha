@@ -3,6 +3,8 @@ const NOT_FOUND = 404;
 const INTERNAL_SERVER_ERROR = 500;
 
 module.exports.errorHandler = (res, err) => {
+  res.send(err);
+  /*
   if (err.name === 'ValidationError' || err.name === 'TypeError') {
     res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
     return;
@@ -14,4 +16,5 @@ module.exports.errorHandler = (res, err) => {
   }
 
   res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка' });
+*/
 };

@@ -11,6 +11,7 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
+    .orFail((err) => errorHandler(res, err))
     .then((user) => res.send({
       name: user.name,
       about: user.about,
