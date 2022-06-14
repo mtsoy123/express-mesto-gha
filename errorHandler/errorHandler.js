@@ -8,7 +8,7 @@ module.exports.errorHandler = (res, err) => {
     return;
   }
 
-  if (err.name === 'CastError') {
+  if (err.name === 'CastError' || err.name === 'TypeError') {
     res.status(NOT_FOUND).send({ message: 'Запрашиваемые данные не найдены' });
     return;
   }
