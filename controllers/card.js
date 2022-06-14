@@ -28,7 +28,8 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
-    .orFail(() => { res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' }); })
+    .orFail(() => res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' }))
+    // .orFail(() => { res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' }); })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ReferenceError') {
@@ -48,6 +49,7 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   { $addToSet: { likes: req.user._id } },
   { new: true, runValidators: true },
 )
+  .orFail(() => res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' }))
   .then((card) => res.send({ data: card }))
   .catch((err) => {
     if (err.name === 'CastError') {
@@ -67,6 +69,7 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
+    .orFail(() => res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' }))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
