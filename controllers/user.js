@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const User = require('../models/user');
 
 module.exports.getUsers = (req, res) => {
@@ -20,4 +19,16 @@ module.exports.createUser = (req, res) => {
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
-// todo refactor w controllers https://practicum.yandex.ru/trainer/web/lesson/29237838-8563-4a61-b293-df39dde99f6b/task/2cac01f2-4ef2-420e-8582-391b20879f50/
+module.exports.updateUserInfo = (req, res) => {
+  const { name, about } = req.body;
+  User.findByIdAndUpdate(req.user._id, { name, about })
+    .then((user) => res.send({ data: user }))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+};
+
+module.exports.updateUserAvatar = (req, res) => {
+  const { avatar } = req.body;
+  User.findByIdAndUpdate(req.user._id, { avatar })
+    .then((user) => res.send({ data: user }))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+};
