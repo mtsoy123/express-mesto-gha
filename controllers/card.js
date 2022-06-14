@@ -35,6 +35,7 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
+    .orFail((err) => errorHandler(res, err))
     .then((card) => res.send({ data: card }))
     .catch((err) => errorHandler(res, err));
 };
