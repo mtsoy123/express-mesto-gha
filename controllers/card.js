@@ -20,16 +20,14 @@ module.exports.deleteCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => errorHandler(res, err));
 };
-
-module.exports.likeCard = (req, res) => {
-  Card.findByIdAndUpdate(
-    req.params.id,
-    { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true },
-  )
-    .then((card) => res.send({ data: card }))
-    .catch((err) => errorHandler(res, err));
-};
+module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
+  req.params.id,
+  { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+  { new: true, runValidators: true },
+)
+  .orFail((err) => errorHandler(res, err))
+  .then((card) => res.send({ data: card }))
+  .catch((err) => errorHandler(res, err));
 
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
