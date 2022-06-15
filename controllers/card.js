@@ -8,7 +8,7 @@ const {
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(CREATED).send(cards))
+    .then((cards) => res.send(cards))
     .catch(() => {
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
     });
@@ -18,7 +18,7 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.status(CREATED).send({ data: card }))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
