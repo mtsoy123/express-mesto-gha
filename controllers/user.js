@@ -19,10 +19,9 @@ module.exports.getUserById = (req, res) => {
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
-      /*      if (err.name === 'TypeError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
-        return;
-      } */
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найдена.' });
+      }
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Указан некорректный _id.' });
         return;
@@ -55,10 +54,9 @@ module.exports.updateUserInfo = (req, res) => {
       _id: user._id,
     }))
     .catch((err) => {
-      /*      if (err.name === 'TypeError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
-        return;
-      } */
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найдена.' });
+      }
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Указаны некорректные данные.' });
         return;
@@ -86,10 +84,9 @@ module.exports.updateUserAvatar = (req, res) => {
         res.status(BAD_REQUEST).send({ message: 'Указаны некорректные данные.' });
         return;
       }
-      /*      if (err.name === 'TypeError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
-        return;
-      } */
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найдена.' });
+      }
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
         return;

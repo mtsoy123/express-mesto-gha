@@ -20,6 +20,9 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
+      }
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
@@ -33,13 +36,11 @@ module.exports.deleteCard = (req, res) => {
     .orFail()
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      /*      if (err.name === 'ReferenceError') {
+      if (err.name === 'DocumentNotFoundError') {
         res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
-        return;
-      } */
+      }
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Указан некорректный _id.' });
-        return;
       }
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
     });
@@ -57,10 +58,9 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
       res.status(BAD_REQUEST).send({ message: 'Указан некорректный _id.' });
       return;
     }
-    /*    if (err.name === 'TypeError') {
+    if (err.name === 'DocumentNotFoundError') {
       res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
-      return;
-    } */
+    }
     res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
   });
 
@@ -77,11 +77,9 @@ module.exports.dislikeCard = (req, res) => {
         res.status(BAD_REQUEST).send({ message: 'Указан некорректный _id.' });
         return;
       }
-      // () => res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' })
-      /*      if (err.name === 'TypeError') {
+      if (err.name === 'DocumentNotFoundError') {
         res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
-        return;
-      } */
+      }
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
     });
 };
