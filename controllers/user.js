@@ -59,7 +59,7 @@ module.exports.updateUserInfo = (req, res) => {
         res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
         return;
       }
-      if (err.name === 'CastError' || 'ValidationError') {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Указаны некорректные данные.' });
         return;
       }
@@ -78,7 +78,7 @@ module.exports.updateUserAvatar = (req, res) => {
       _id: user._id,
     }))
     .catch((err) => {
-      if (err.name === 'CastError' || 'ValidationError') {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Указаны некорректные данные.' });
         return;
       }
