@@ -4,7 +4,7 @@ const {
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
   CREATED,
-} = require('../errorStatuses');
+} = require('../utils/errorStatuses');
 
 const opts = { runValidators: true, new: true };
 
@@ -20,7 +20,8 @@ module.exports.getUserById = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найдена.' });
+        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
+        return;
       }
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Указан некорректный _id.' });
@@ -55,14 +56,11 @@ module.exports.updateUserInfo = (req, res) => {
     }))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найдена.' });
-      }
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Указаны некорректные данные.' });
+        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
         return;
       }
-      if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
+      if (err.name === 'CastError' || 'ValidationError') {
+        res.status(BAD_REQUEST).send({ message: 'Указаны некорректные данные.' });
         return;
       }
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
@@ -80,15 +78,12 @@ module.exports.updateUserAvatar = (req, res) => {
       _id: user._id,
     }))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'CastError' || 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Указаны некорректные данные.' });
         return;
       }
       if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найдена.' });
-      }
-      if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+        res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
         return;
       }
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });

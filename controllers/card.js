@@ -4,7 +4,7 @@ const {
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
   CREATED,
-} = require('../errorStatuses');
+} = require('../utils/errorStatuses');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -20,9 +20,10 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link, owner })
     .then((card) => res.status(CREATED).send({ data: card }))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
+      /*      if (err.name === 'DocumentNotFoundError') {
         res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
-      }
+        return;
+      } */
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
@@ -38,9 +39,11 @@ module.exports.deleteCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
+        return;
       }
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Указан некорректный _id.' });
+        return;
       }
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
     });
@@ -60,6 +63,7 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
     }
     if (err.name === 'DocumentNotFoundError') {
       res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
+      return;
     }
     res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
   });
@@ -79,6 +83,7 @@ module.exports.dislikeCard = (req, res) => {
       }
       if (err.name === 'DocumentNotFoundError') {
         res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
+        return;
       }
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
     });
