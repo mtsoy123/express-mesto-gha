@@ -1,21 +1,21 @@
 const jwt = require('jsonwebtoken');
 const UNAUTHORIZED = require('../utils/errorStatuses');
+// todo statuscode change on const
 
 module.exports = (req, res, next) => {
-  const { auth } = req.headers;
+  const token = req.cookies.jwt;
 
-  if (!auth || !auth.startsWith('Bearer ')) {
-    return res.status(UNAUTHORIZED).send({ message: 'console.log' });
+  if (!token) {
+    return res.status(401).send({ message: '12console.log' });
   }
-
-  const token = auth.replace('Bearer ', '');
 
   let payload;
 
   try {
-    jwt.verify(token, 'secret-key');
+    // console.log(jwt.verify(token, 'secret-key'));
+    payload = jwt.verify(token, 'secret-key');
   } catch (err) {
-    return res.status(UNAUTHORIZED).send({ message: 'console.log' });
+    return res.status(401).send({ message: 'console.log' });
   }
 
   req.user = payload;

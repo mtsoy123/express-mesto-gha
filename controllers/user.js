@@ -18,6 +18,15 @@ module.exports.getUsers = (req, res) => {
     .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' }));
 };
 
+module.exports.getCurrentUser = (req, res) => {
+  const id = jwt.verify(req.cookies.jwt, 'secret-key');
+  console.log(id);
+  User.findById(id)
+    .orFail()
+    .then((users) => res.send(users))
+    .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка getcurrentuser.' }));
+};
+
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
     .orFail()
@@ -44,10 +53,11 @@ module.exports.createUser = (req, res) => {
     .then((hash) => {
       User.create({
         name, about, avatar, email, password: hash,
-      });
-    })
-    .then((user) => {
-      res.status(CREATED).send({ data: user });
+      })
+        .then((user) => {
+          // console.log(user);
+          res.status(CREATED).send({ data: user });
+        });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -106,16 +116,16 @@ module.exports.updateUserAvatar = (req, res) => {
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
-  User.findUserByCredentials(email, password)
+  User.findUserByCred(email, password)
     .then((user) => {
+      // console.log(user);
       const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
-
       res.cookie('jwt', token, {
         httpOnly: true,
       });
       res.send({ token });
     })
     .catch((err) => {
-      res.status(UNAUTHORIZED).send({ message: '' });
+      res.status(UNAUTHORIZED).send({ message: 'www' });
     });
 };
