@@ -1,4 +1,6 @@
+const jwt = require('jsonwebtoken');
 const Card = require('../models/card');
+
 const {
   BAD_REQUEST,
   NOT_FOUND,
@@ -33,9 +35,15 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
-    .orFail()
-    .then((card) => res.send({ data: card }))
+  const userId = jwt.verify(req.cookies.jwt, 'secret-key')._id;
+  console.log(userId);
+  Card.find({ owner: userId })
+    .orFail()// todo throw new error
+    .then(() => {
+      Card.findByIdAndRemove(req.params.id)
+        .orFail()
+        .then((card) => res.send({ data: card }));
+    })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });

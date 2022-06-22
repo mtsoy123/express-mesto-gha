@@ -20,7 +20,6 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getCurrentUser = (req, res) => {
   const id = jwt.verify(req.cookies.jwt, 'secret-key');
-  console.log(id);
   User.findById(id)
     .orFail()
     .then((users) => res.send(users))
