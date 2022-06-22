@@ -1,4 +1,6 @@
+const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
+
 const {
   BAD_REQUEST,
   NOT_FOUND,
@@ -32,9 +34,20 @@ module.exports.getUserById = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.status(CREATED).send({ data: user }))
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  console.log(password);
+  bcryptjs.hash(password, 10)
+    .then((hash) => {
+      console.log(123);
+      User.create({
+        name, about, avatar, email, hash,
+      });
+    })
+    .then((user) => {
+      res.status(CREATED).send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
@@ -89,3 +102,14 @@ module.exports.updateUserAvatar = (req, res) => {
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла неизвестная ошибка.' });
     });
 };
+
+/* module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+  User.findOne ({email, password})
+  .orFail()
+  .then(res => )
+  .catch((err) => {
+    res.status(123)
+    .send({message: "qwe"})
+  })
+}; */
