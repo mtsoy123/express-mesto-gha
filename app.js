@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
 const { NOT_FOUND } = require('./utils/errorStatuses');
+const { login, createUser } = require('./controllers/user');
 
 const { PORT = 3000 } = process.env;
 
@@ -22,6 +23,8 @@ app.use((req, res, next) => {
 });
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use((req, res) => {
   res.status(NOT_FOUND).send({ message: 'Запрашиваемая страница не найдена.' });
 });
