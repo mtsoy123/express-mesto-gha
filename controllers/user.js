@@ -1,4 +1,5 @@
 const bcryptjs = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const {
@@ -6,6 +7,7 @@ const {
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
   CREATED,
+  UNAUTHORIZED,
 } = require('../utils/errorStatuses');
 
 const opts = { runValidators: true, new: true };
@@ -37,12 +39,11 @@ module.exports.createUser = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  console.log(password);
+
   bcryptjs.hash(password, 10)
     .then((hash) => {
-      console.log(123);
       User.create({
-        name, about, avatar, email, hash,
+        name, about, avatar, email, password: hash,
       });
     })
     .then((user) => {
@@ -103,13 +104,18 @@ module.exports.updateUserAvatar = (req, res) => {
     });
 };
 
-/* module.exports.login = (req, res) => {
+module.exports.login = (req, res) => {
   const { email, password } = req.body;
-  User.findOne ({email, password})
-  .orFail()
-  .then(res => )
-  .catch((err) => {
-    res.status(123)
-    .send({message: "qwe"})
-  })
-}; */
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
+
+      res.cookie('jwt', token, {
+        httpOnly: true,
+      });
+      res.send({ token });
+    })
+    .catch((err) => {
+      res.status(UNAUTHORIZED).send({ message: '' });
+    });
+};
