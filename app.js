@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
 const { NOT_FOUND } = require('./utils/errorStatuses');
@@ -32,13 +33,11 @@ app.use(auth);
 }); */
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
-app.use((req, res) => {
-  res.status(NOT_FOUND).send({ message: 'Запрашиваемая страница не найдена.' });
-});
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
-
   res
     .status(statusCode)
     .send({
