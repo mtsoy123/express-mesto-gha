@@ -22,10 +22,6 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link, owner })
     .then((card) => res.status(CREATED).send({ data: card }))
     .catch((err) => {
-      /*      if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND).send({ message: 'Карточка по указанному _id не найдена.' });
-        return;
-      } */
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
         return;
