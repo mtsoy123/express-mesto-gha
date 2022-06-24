@@ -21,12 +21,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       // eslint-disable-next-line max-len
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-      /*      validate: {
-        validator: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~://?#[\]@!$&'()*+,;=.]+/igm,
-        // validator: new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]
-        // +)+[\w\-\._~:\/\/?#[\]@!\$&'\(\)\*\+,;=.]+/igm),
-        message: 'Неправильный формат аватара',
-      }, */
     },
     email: {
       required: true,

@@ -75,12 +75,14 @@ module.exports.updateUserInfo = (req, res, next) => {
   Card.find({ _id: userId })
     .then((r) => {
       if (!r) {
-        throw new NotFoundErr('Пользователь по указанному _id не найден.');
+        next(new NotFoundErr('Пользователь по указанному _id не найден.'));
+        return;
       }
       User.findByIdAndUpdate(req.user._id, { name, about }, opts)
         .then((user) => {
           if (!user) {
-            throw new NotFoundErr('Пользователь по указанному _id не найден.');
+            next(new NotFoundErr('Пользователь по указанному _id не найден.'));
+            return;
           }
 
           res
@@ -103,12 +105,14 @@ module.exports.updateUserAvatar = (req, res, next) => {
   User.find({ _id: userId })
     .then((r) => {
       if (!r) {
-        throw new NotFoundErr('Пользователь по указанному _id не найден.');
+        next(new NotFoundErr('Пользователь по указанному _id не найден.'));
+        return;
       }
       User.findByIdAndUpdate(req.user._id, { avatar }, opts)
         .then((user) => {
           if (!user) {
-            throw new NotFoundErr('Пользователь по указанному _id не найден.');
+            next(new NotFoundErr('Пользователь по указанному _id не найден.'));
+            return;
           }
           res.send({
             name: user.name,
@@ -127,20 +131,16 @@ module.exports.login = (req, res, next) => {
   User.findUserByCred(email, password)
     .then((user) => {
       if (!user) {
-        throw new NotFoundErr('Пользователь по указанному _id не найден.');
+        next(new NotFoundErr('Пользователь по указанному _id не найден.'));
+        return;
       }
 
       const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
+
       res.cookie('jwt', token, {
         httpOnly: true,
       });
       return res.status(OK).send({ token });
     })
-    .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        err.statusCode(123);
-        err.message('qwe');
-        next(err);
-      } next(err);
-    });
+    .catch(next);
 };
