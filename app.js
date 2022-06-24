@@ -46,8 +46,8 @@ app.post(
 
 app.use(auth);
 
-app.use('/users', userRouter);
-app.use('/cards', cardRouter);
+app.use('/users', auth, userRouter);
+app.use('/cards', auth, cardRouter);
 
 app.use(errors());
 
