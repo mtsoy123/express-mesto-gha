@@ -24,17 +24,15 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   const userId = jwt.verify(req.cookies.jwt, 'secret-key')._id;
   console.log(userId);
-  Card.find({ owner: userId })
-    .orFail(new ForbiddenErr('Вы пытаетесь удалить чудую карточку'))
-    .then(() => {
-      Card.findByIdAndRemove(req.params.id)
-        .then((card) => {
-          if (!card) {
-            next(new NotFoundErr('Карточка по указанному _id не найдена.'));
-            return;
-          }
-          res.status(OK).send({ data: card });
-        });
+
+  Promise.all([Card.find({ owner: userId }), Card.findByIdAndRemove(req.params.id)])
+    .then((values) => {
+      const [user, card] = values;
+      if (!card) {
+        next(new NotFoundErr('Карточка по указанному _id не найдена.'));
+        return;
+      }
+      res.status(OK).send({ data: card });
     })
     .catch(next);
 };
