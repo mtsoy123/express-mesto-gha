@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Card = require('../models/card');
 const NotFoundErr = require('../utils/errors/NotFoundErr');
-const ForbiddenErr = require('../utils/errors/ForbiddenErr');
 
 const {
   CREATED, OK,
@@ -24,25 +23,20 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   const userId = jwt.verify(req.cookies.jwt, 'secret-key')._id;
 
-  // Несуществующая карточка
-  // Существующая карточка, другой оунер
-  // Сущестувующая карточка, я оунер
+  Card.findById(req.params.id)
+    .then((card) => {
+      if (!card) {
+        next(new NotFoundErr('Карточка по  _id не найдена.'));
+        return;
+      }
 
-  Card.find({ _id: req.params.id })
-  // .orFail(next(new ForbiddenErr('Вы пытаетесь удалить чужую карточку')))
-    .orFail(new NotFoundErr('Карточка по указанному _id не найдена.'))
-    .then(() => {
-      Card.find({ owner: userId })
-        .orFail(new ForbiddenErr('Вы пытаетесь удалить чужую карточку'))
-        .then(() => {
-          Card.findByIdAndRemove(req.params.id)
-            .then((card) => {
-              if (!card) {
-                next(new NotFoundErr('Карточка по указанному _id не найдена.'));
-                return;
-              }
-              res.status(OK).send({ data: card });
-            });
+      Card.findOneAndRemove({ owner: userId, _id: req.params.id })
+        .then((matchingCard) => {
+          if (!matchingCard) {
+            next(new NotFoundErr('Вы пытаетесь удалить чужую карточку'));
+            return;
+          }
+          res.status(OK).send({ data: matchingCard });
         });
     })
     .catch(next);
