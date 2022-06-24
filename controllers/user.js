@@ -43,7 +43,6 @@ module.exports.getUserById = (req, res, next) => {
     // .catch(next);
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        console.log(BadRequestErr.statusCode);
         next(new BadRequestErr('Пользователь'));
         return;
       } next(err);
@@ -73,7 +72,10 @@ module.exports.createUser = (req, res, next) => {
         next(new ConflictErr('Пользователь с таким email уже зарегистрирован'));
         return;
       }
-
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        next(new BadRequestErr('Пользователь'));
+        return;
+      }
       next(err);
     });
 };
