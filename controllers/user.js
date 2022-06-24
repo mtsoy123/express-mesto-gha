@@ -2,16 +2,11 @@ const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const BadRequestErr = require('../utils/errors/BadRequestErr');
-const UnauthorizedErr = require('../utils/errors/UnauthorizedErr');
 const NotFoundErr = require('../utils/errors/NotFoundErr');
 const ConflictErr = require('../utils/errors/ConflictErr');
 
 const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
   CREATED,
-  UNAUTHORIZED,
   DUPLICATE_ERROR,
 } = require('../utils/errorStatuses');
 const Card = require('../models/card');
@@ -20,7 +15,7 @@ const opts = { runValidators: true, new: true };
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.send(users))
+    .then((users) => res.status(CREATED).send(users))
     .catch(next);
 };
 
@@ -61,7 +56,6 @@ module.exports.createUser = (req, res, next) => {
       res.status(CREATED).send({ data: user });
     })
     .catch((err) => {
-      console.log(err);
       if (err.code === DUPLICATE_ERROR) {
         next(new ConflictErr('Пользователь с таким email уже зарегистрирован'));
         return;
@@ -137,7 +131,7 @@ module.exports.login = (req, res, next) => {
       res.cookie('jwt', token, {
         httpOnly: true,
       });
-      res.send({ token });
+      res.status(CREATED).send({ token });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {

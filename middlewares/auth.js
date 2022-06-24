@@ -6,7 +6,6 @@ module.exports = (req, res, next) => {
 
   if (!token) {
     throw new UnauthorizedErr('Пользователь не авторизован');
-    return;
   }
 
   let payload;
@@ -15,7 +14,6 @@ module.exports = (req, res, next) => {
     payload = jwt.verify(token, 'secret-key');
   } catch (err) {
     throw new UnauthorizedErr('Пользователь не авторизован');
-    return;
   }
 
   req.user = payload;

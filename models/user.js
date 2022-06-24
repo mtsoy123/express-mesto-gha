@@ -21,7 +21,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
       validate: {
-        validator: new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:\/\/?#[\]@!\$&'\(\)\*\+,;=.]+/igm),
+        validator: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~://?#[\]@!$&'()*+,;=.]+/igm,
+        // validator: new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]
+        // +)+[\w\-\._~:\/\/?#[\]@!\$&'\(\)\*\+,;=.]+/igm),
         message: 'Неправильный формат аватара',
       },
     },
@@ -51,6 +53,7 @@ const userSchema = new mongoose.Schema(
   },
 );
 
+// eslint-disable-next-line func-names
 userSchema.statics.findUserByCred = function (email, password) {
   if (!email || !password) {
     throw new UnauthorizedErr(' Не передан email или пароль');

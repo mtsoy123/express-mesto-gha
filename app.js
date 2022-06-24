@@ -36,7 +36,9 @@ app.post(
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
-      avatar: Joi.string().regex(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:\/\/?#[\]@!\$&'\(\)\*\+,;=.]+/im, { invert: true }),
+      avatar: Joi.string().regex(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~://?#[\]@!$&'()*+,;=.]+/im, { invert: true }),
+      // avatar: Joi.string().regex(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w
+      // \.-]+)+[\w\-\._~:\/\/?#[\]@!\$&'\(\)\*\+,;=.]+/im, { invert: true }),
       email: Joi.string().required().email(),
       password: Joi.string().required(),
     }).unknown(true),
@@ -51,9 +53,9 @@ app.use('/cards', cardRouter);
 
 app.use(errors());
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
-  console.log(err);
   res
     .status(statusCode)
     .send({
