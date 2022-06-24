@@ -2,7 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const { errors } = require('celebrate');
+const { errors, celebrate } = require('celebrate');
+const Joi = require('joi');
 const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
 const { login, createUser } = require('./controllers/user');
@@ -18,8 +19,30 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post(
+  '/signin',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string(),
+      password: Joi.string(),
+    }).unknown(true),
+  }),
+  login,
+);
+
+app.post(
+  '/signup',
+  celebrate({
+    body: Joi.object().keys({
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
+      avatar: Joi.string(),
+      email: Joi.string(),
+      password: Joi.string(),
+    }).unknown(true),
+  }),
+  createUser,
+);
 
 app.use(auth);
 
