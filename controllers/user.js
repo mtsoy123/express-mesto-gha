@@ -22,7 +22,7 @@ module.exports.getUsers = (req, res, next) => {
 module.exports.getCurrentUser = (req, res, next) => {
   const id = jwt.verify(req.cookies.jwt, 'secret-key');
   User.findById(id)
-    .then((users) => res.send(users))
+    .then((users) => res.status(CREATED).send(users))
     .catch(next);
 };
 
@@ -61,6 +61,7 @@ module.exports.createUser = (req, res, next) => {
         return;
       }
       if (err.name === 'ValidationError') {
+        console.log(err);
         next(new BadRequestErr('Некорректный формат запроса'));
         return;
       }
@@ -131,7 +132,7 @@ module.exports.login = (req, res, next) => {
       res.cookie('jwt', token, {
         httpOnly: true,
       });
-      res.status(CREATED).send({ token });
+      return res.status(CREATED).send({ token });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {

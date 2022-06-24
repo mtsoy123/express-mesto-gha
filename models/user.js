@@ -13,19 +13,19 @@ const userSchema = new mongoose.Schema(
     },
     about: {
       type: String,
-      default: 'Исследователь',
+      default: 'Исследователь океана',
       minlength: 2,
       maxlength: 30,
     },
     avatar: {
       type: String,
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-      validate: {
+      /*      validate: {
         validator: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~://?#[\]@!$&'()*+,;=.]+/igm,
         // validator: new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]
         // +)+[\w\-\._~:\/\/?#[\]@!\$&'\(\)\*\+,;=.]+/igm),
         message: 'Неправильный формат аватара',
-      },
+      }, */
     },
     email: {
       required: true,
