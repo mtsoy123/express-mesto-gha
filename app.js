@@ -46,15 +46,16 @@ app.post(
 
 app.use(auth);
 
-app.use('/users', auth, userRouter);
-app.use('/cards', auth, cardRouter);
+app.use('/users', userRouter);
+app.use('/cards', cardRouter);
 
 app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
+  console.log(err);
   res
-    .statusCode(statusCode)
+    .status(statusCode)
     .send({
       message: statusCode === 500
         ? 'На сервере произошла ошибка'
