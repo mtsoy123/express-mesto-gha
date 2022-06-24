@@ -38,6 +38,7 @@ app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
+  console.log(err);
   res
     .status(statusCode)
     .send({
@@ -48,3 +49,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, 'localhost');
+
+// /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:\/\/?#[\]@!\$&'\(\)\*\+,;=.]+/igm

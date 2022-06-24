@@ -12,6 +12,7 @@ const {
   CREATED,
   UNAUTHORIZED,
 } = require('../utils/errorStatuses');
+const Card = require('../models/card');
 
 const opts = { runValidators: true, new: true };
 
@@ -37,7 +38,14 @@ module.exports.getUserById = (req, res, next) => {
 
       res.send(user);
     })
-    .catch(next);
+    // .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        console.log(BadRequestErr.statusCode);
+        next(new BadRequestErr('Пользователь'));
+        return;
+      } next(err);
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -59,36 +67,49 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, opts)
-    .orFail()
-    .then((user) => {
-      if (!user) {
+  const userId = jwt.verify(req.cookies.jwt, 'secret-key')._id;
+  Card.find({ _id: userId })
+    .then((r) => {
+      if (!r) {
         throw new NotFoundErr('Пользователь по указанному _id не найден.');
       }
+      User.findByIdAndUpdate(req.user._id, { name, about }, opts)
+        .then((user) => {
+          if (!user) {
+            throw new NotFoundErr('Пользователь по указанному _id не найден.');
+          }
 
-      res.send({
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        _id: user._id,
-      });
+          res.send({
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+            _id: user._id,
+          });
+        });
     })
     .catch(next);
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, opts)
-    .then((user) => {
-      if (!user) {
+  const userId = jwt.verify(req.cookies.jwt, 'secret-key')._id;
+  User.find({ _id: userId })
+    .then((r) => {
+      if (!r) {
         throw new NotFoundErr('Пользователь по указанному _id не найден.');
       }
-      res.send({
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        _id: user._id,
-      });
+      User.findByIdAndUpdate(req.user._id, { avatar }, opts)
+        .then((user) => {
+          if (!user) {
+            throw new NotFoundErr('Пользователь по указанному _id не найден.');
+          }
+          res.send({
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+            _id: user._id,
+          });
+        });
     })
     .catch(next);
 };
@@ -104,5 +125,12 @@ module.exports.login = (req, res, next) => {
       });
       res.send({ token });
     })
-    .catch(next);
+    // .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        err.statusCode(123);
+        err.message('qwe');
+        next(err);
+      } next(err);
+    });
 };
