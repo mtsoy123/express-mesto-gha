@@ -26,6 +26,7 @@ module.exports.deleteCard = (req, res, next) => {
   console.log(userId);
 
   Promise.all([Card.find({ owner: userId }), Card.findByIdAndRemove(req.params.id)])
+    .orFail(new ForbiddenErr('Вы пытаетесь удалить чужую карточку'))
     .then((values) => {
       const [user, card] = values;
       if (!card) {
