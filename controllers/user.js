@@ -8,6 +8,7 @@ const ConflictErr = require('../utils/errors/ConflictErr');
 const {
   CREATED,
   DUPLICATE_ERROR,
+  OK,
 } = require('../utils/errorStatuses');
 const Card = require('../models/card');
 
@@ -15,7 +16,7 @@ const opts = { runValidators: true, new: true };
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(CREATED).send(users))
+    .then((users) => res.status(OK).send(users))
     .catch(next);
 };
 
@@ -83,12 +84,14 @@ module.exports.updateUserInfo = (req, res, next) => {
             throw new NotFoundErr('Пользователь по указанному _id не найден.');
           }
 
-          res.send({
-            name: user.name,
-            about: user.about,
-            avatar: user.avatar,
-            _id: user._id,
-          });
+          res
+            .status(OK)
+            .send({
+              name: user.name,
+              about: user.about,
+              avatar: user.avatar,
+              _id: user._id,
+            });
         });
     })
     .catch(next);
@@ -132,7 +135,7 @@ module.exports.login = (req, res, next) => {
       res.cookie('jwt', token, {
         httpOnly: true,
       });
-      return res.status(CREATED).send({ token });
+      return res.status(OK).send({ token });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {

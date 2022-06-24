@@ -3,7 +3,7 @@ const Card = require('../models/card');
 const NotFoundErr = require('../utils/errors/NotFoundErr');
 
 const {
-  CREATED,
+  CREATED, OK,
 } = require('../utils/errorStatuses');
 
 module.exports.getCards = (req, res, next) => {
@@ -28,9 +28,10 @@ module.exports.deleteCard = (req, res, next) => {
       Card.findByIdAndRemove(req.params.id)
         .then((card) => {
           if (!card) {
-            throw new NotFoundErr('Карточка по указанному _id не найдена.');
+            next(new NotFoundErr('Карточка по указанному _id не найдена.'));
+            return;
           }
-          res.send({ data: card });
+          res.status(OK).send({ data: card });
         });
     })
     .catch(next);
@@ -43,7 +44,8 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
 )
   .then((card) => {
     if (!card) {
-      throw new NotFoundErr('Карточка по указанному _id не найдена.');
+      next(new NotFoundErr('Карточка по указанному _id не найдена.'));
+      return;
     }
     res.send({ data: card });
   })
@@ -57,7 +59,8 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new NotFoundErr('Карточка по указанному _id не найдена.');
+        next(new NotFoundErr('Карточка по указанному _id не найдена.'));
+        return;
       }
       res.send({ data: card });
     })
