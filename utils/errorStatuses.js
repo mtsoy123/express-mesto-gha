@@ -5,7 +5,7 @@ const UNAUTHORIZED = 401;
 const CREATED = 201;
 const FORBIDDEN = 403;
 const CONFLICT = 409;
-const DUPLICATE_ERROR = 1100;
+const DUPLICATE_ERROR = 11000;
 
 module.exports = {
   BAD_REQUEST,

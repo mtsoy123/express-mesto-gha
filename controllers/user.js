@@ -40,10 +40,9 @@ module.exports.getUserById = (req, res, next) => {
 
       res.send(user);
     })
-    // .catch(next);
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        next(new BadRequestErr('Пользователь'));
+        next(new BadRequestErr('Некорректный формат запроса'));
         return;
       } next(err);
     });
@@ -54,30 +53,24 @@ module.exports.createUser = (req, res, next) => {
     name, about, avatar, email, password,
   } = req.body;
 
-  if (!email || !password) {
-    throw new BadRequestErr(' Не передан email или пароль');
-  }
-
   bcryptjs.hash(password, 10)
-    .then((hash) => {
-      User.create({
-        name, about, avatar, email, password: hash,
-      })
-        .then((user) => {
-          res.status(CREATED).send({ data: user });
-        })
-        .catch((err) => {
-          console.log('ошибка', err);
-          if (err.code === DUPLICATE_ERROR) {
-            next(new ConflictErr('Пользователь с таким email уже зарегистрирован'));
-            return;
-          }
-          if (err.name === 'ValidationError') {
-            next(new BadRequestErr('Неправильный формат запроса'));
-            return;
-          }
-          next(err);
-        });
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => {
+      res.status(CREATED).send({ data: user });
+    })
+    .catch((err) => {
+      console.log(err);
+      if (err.code === DUPLICATE_ERROR) {
+        next(new ConflictErr('Пользователь с таким email уже зарегистрирован'));
+        return;
+      }
+      if (err.name === 'ValidationError') {
+        next(new BadRequestErr('Некорректный формат запроса'));
+        return;
+      }
+      next(err);
     });
 };
 
@@ -136,6 +129,10 @@ module.exports.login = (req, res, next) => {
 
   User.findUserByCred(email, password)
     .then((user) => {
+      if (!user) {
+        throw new NotFoundErr('Пользователь по указанному _id не найден.');
+      }
+
       const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
       res.cookie('jwt', token, {
         httpOnly: true,
