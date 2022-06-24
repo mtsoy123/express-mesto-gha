@@ -140,7 +140,7 @@ module.exports.login = (req, res, next) => {
       res.cookie('jwt', token, {
         httpOnly: true,
       });
-      return res.status(OK).send({ token });
+      res.status(OK).send({ token });
     })
     .catch(next);
 };
