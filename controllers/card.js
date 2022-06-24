@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Card = require('../models/card');
 const NotFoundErr = require('../utils/errors/NotFoundErr');
+const ForbiddenErr = require('../utils/errors/ForbiddenErr');
 
 const {
   CREATED, OK,
@@ -22,8 +23,9 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   const userId = jwt.verify(req.cookies.jwt, 'secret-key')._id;
-
+  console.log(userId);
   Card.find({ owner: userId })
+    .orFail(new ForbiddenErr('Вы пытаетесь удалить чудую карточку'))
     .then(() => {
       Card.findByIdAndRemove(req.params.id)
         .then((card) => {
