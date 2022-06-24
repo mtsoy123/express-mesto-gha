@@ -23,8 +23,8 @@ app.post(
   '/signin',
   celebrate({
     body: Joi.object().keys({
-      email: Joi.string(),
-      password: Joi.string(),
+      email: Joi.string().required(),
+      password: Joi.string().required(),
     }).unknown(true),
   }),
   login,
@@ -37,8 +37,8 @@ app.post(
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
       avatar: Joi.string(),
-      email: Joi.string(),
-      password: Joi.string(),
+      email: Joi.string().required(),
+      password: Joi.string().required(),
     }).unknown(true),
   }),
   createUser,

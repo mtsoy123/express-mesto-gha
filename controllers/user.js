@@ -65,18 +65,19 @@ module.exports.createUser = (req, res, next) => {
       })
         .then((user) => {
           res.status(CREATED).send({ data: user });
+        })
+        .catch((err) => {
+          console.log('ошибка', err);
+          if (err.code === DUPLICATE_ERROR) {
+            next(new ConflictErr('Пользователь с таким email уже зарегистрирован'));
+            return;
+          }
+          if (err.name === 'ValidationError') {
+            next(new BadRequestErr('Неправильный формат запроса'));
+            return;
+          }
+          next(err);
         });
-    })
-    .catch((err) => {
-      if (err.code === DUPLICATE_ERROR) {
-        next(new ConflictErr('Пользователь с таким email уже зарегистрирован'));
-        return;
-      }
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        next(new BadRequestErr('Пользователь'));
-        return;
-      }
-      next(err);
     });
 };
 
