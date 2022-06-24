@@ -62,7 +62,6 @@ module.exports.createUser = (req, res, next) => {
         return;
       }
       if (err.name === 'ValidationError') {
-        console.log(err);
         next(new BadRequestErr('Некорректный формат запроса'));
         return;
       }

@@ -23,17 +23,27 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   const userId = jwt.verify(req.cookies.jwt, 'secret-key')._id;
-  console.log(userId);
 
-  Promise.all([Card.find({ owner: userId }), Card.findByIdAndRemove(req.params.id)])
-    .orFail(new ForbiddenErr('Вы пытаетесь удалить чужую карточку'))
-    .then((values) => {
-      const [user, card] = values;
-      if (!card) {
-        next(new NotFoundErr('Карточка по указанному _id не найдена.'));
-        return;
-      }
-      res.status(OK).send({ data: card });
+  // Несуществующая карточка
+  // Существующая карточка, другой оунер
+  // Сущестувующая карточка, я оунер
+
+  Card.find({ _id: req.params.id })
+  // .orFail(next(new ForbiddenErr('Вы пытаетесь удалить чужую карточку')))
+    .orFail(new NotFoundErr('Карточка по указанному _id не найдена.'))
+    .then(() => {
+      Card.find({ owner: userId })
+        .orFail(new ForbiddenErr('Вы пытаетесь удалить чужую карточку'))
+        .then(() => {
+          Card.findByIdAndRemove(req.params.id)
+            .then((card) => {
+              if (!card) {
+                next(new NotFoundErr('Карточка по указанному _id не найдена.'));
+                return;
+              }
+              res.status(OK).send({ data: card });
+            });
+        });
     })
     .catch(next);
 };
