@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 const Card = require('../models/card');
-const BadRequestErr = require('../utils/errors/badRequestErr');
-const UnauthorizedErr = require('../utils/errors/unauthorizedErr');
-const NotFoundErr = require('../utils/errors/notFoundErr');
+const BadRequestErr = require('../utils/errors/BadRequestErr');
+const UnauthorizedErr = require('../utils/errors/UnauthorizedErr');
+const NotFoundErr = require('../utils/errors/NotFoundErr');
 
 const {
   BAD_REQUEST,

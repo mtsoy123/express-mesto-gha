@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
+const BadRequestErr = require('../utils/errors/BadRequestErr');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -26,7 +27,6 @@ const userSchema = new mongoose.Schema({
     },
   },
   email: {
-    unique: true,
     required: true,
     type: String,
     validate: {
@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema({
         return validator.isEmail(email);
       },
     },
+    unique: true,
   },
   password: {
     required: true,
@@ -45,6 +46,9 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.statics.findUserByCred = function (email, password) {
+  if (!email || !password) {
+    throw new BadRequestErr(' Не передан email или пароль');
+  }
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {

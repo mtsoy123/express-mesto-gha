@@ -1,9 +1,10 @@
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const BadRequestErr = require('../utils/errors/badRequestErr');
-const UnauthorizedErr = require('../utils/errors/unauthorizedErr');
-const NotFoundErr = require('../utils/errors/notFoundErr');
+const BadRequestErr = require('../utils/errors/BadRequestErr');
+const UnauthorizedErr = require('../utils/errors/UnauthorizedErr');
+const NotFoundErr = require('../utils/errors/NotFoundErr');
+const ConflictErr = require('../utils/errors/ConflictErr');
 
 const {
   BAD_REQUEST,
@@ -11,6 +12,7 @@ const {
   INTERNAL_SERVER_ERROR,
   CREATED,
   UNAUTHORIZED,
+  DUPLICATE_ERROR,
 } = require('../utils/errorStatuses');
 const Card = require('../models/card');
 
@@ -53,6 +55,10 @@ module.exports.createUser = (req, res, next) => {
     name, about, avatar, email, password,
   } = req.body;
 
+  if (!email || !password) {
+    throw new BadRequestErr(' Не передан email или пароль');
+  }
+
   bcryptjs.hash(password, 10)
     .then((hash) => {
       User.create({
@@ -62,7 +68,14 @@ module.exports.createUser = (req, res, next) => {
           res.status(CREATED).send({ data: user });
         });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.code === DUPLICATE_ERROR) {
+        next(new ConflictErr('Пользователь с таким email уже зарегистрирован'));
+        return;
+      }
+
+      next(err);
+    });
 };
 
 module.exports.updateUserInfo = (req, res, next) => {
@@ -93,6 +106,7 @@ module.exports.updateUserInfo = (req, res, next) => {
 module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const userId = jwt.verify(req.cookies.jwt, 'secret-key')._id;
+
   User.find({ _id: userId })
     .then((r) => {
       if (!r) {
@@ -116,16 +130,15 @@ module.exports.updateUserAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
+
   User.findUserByCred(email, password)
     .then((user) => {
-      // console.log(user);
       const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
       res.cookie('jwt', token, {
         httpOnly: true,
       });
       res.send({ token });
     })
-    // .catch(next);
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         err.statusCode(123);
