@@ -8,7 +8,8 @@ const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
 const { login, createUser } = require('./controllers/user');
 const auth = require('./middlewares/auth');
-const { NOT_FOUND } = require('./utils/errorStatuses');
+const NotFoundErr = require('./utils/errors/NotFoundErr');
+const validateLink = require('./utils/regex');
 
 const { PORT = 3000 } = process.env;
 
@@ -26,7 +27,7 @@ app.post(
     body: Joi.object().keys({
       email: Joi.string().required().email(),
       password: Joi.string().required(),
-    }).unknown(true),
+    }),
   }),
   login,
 );
@@ -37,10 +38,12 @@ app.post(
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
-      avatar: Joi.string().regex(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~://?#[\]@!$&'()*+,;=.]+/im),
+      avatar: Joi.string().regex(validateLink),
+      // eslint-disable-next-line max-len
+      // avatar: Joi.string().regex(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~://?#[\]@!$&'()*+,;=.]+/im),
       email: Joi.string().required().email(),
       password: Joi.string().required(),
-    }).unknown(true),
+    }),
   }),
   createUser,
 );
@@ -50,8 +53,8 @@ app.use(auth);
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 
-app.use((req, res) => {
-  res.status(NOT_FOUND).send({ message: 'Запрашиваемая страница не найдена.' });
+app.use((req, resб, next) => {
+  next(new NotFoundErr('Страница не найдена'));
 });
 
 app.use(errors());

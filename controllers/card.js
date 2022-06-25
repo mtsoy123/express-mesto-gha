@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 const Card = require('../models/card');
 const NotFoundErr = require('../utils/errors/NotFoundErr');
 const ForbiddenErr = require('../utils/errors/ForbiddenErr');
@@ -6,6 +5,7 @@ const ForbiddenErr = require('../utils/errors/ForbiddenErr');
 const {
   CREATED, OK,
 } = require('../utils/errorStatuses');
+const BadRequestErr = require('../utils/errors/BadRequestErr');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -18,27 +18,25 @@ module.exports.createCard = (req, res, next) => {
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.status(CREATED).send({ data: card }))
-    .catch(next);
-};
-
-module.exports.deleteCard = (req, res, next) => {
-  const userId = jwt.verify(req.cookies.jwt, 'secret-key')._id;
-
-  Card.findById(req.params.id)
-    .then((card) => {
-      if (!card) {
-        next(new NotFoundErr('Карточка по  _id не найдена.'));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestErr('Некорректный формат запроса'));
         return;
       }
 
-      Card.findOneAndRemove({ owner: userId, _id: req.params.id })
-        .then((matchingCard) => {
-          if (!matchingCard) {
-            next(new ForbiddenErr('Вы пытаетесь удалить чужую карточку'));
-            return;
-          }
-          res.status(OK).send({ data: matchingCard });
-        });
+      next(err);
+    });
+};
+
+module.exports.deleteCard = (req, res, next) => {
+  Card.findById(req.params.id)
+    .orFail(() => next(new NotFoundErr('Карточка по  _id не найдена.')))
+    .then((card) => {
+      if (!card.owner.equals(req.user._id)) {
+        next(new ForbiddenErr('Вы пытаетесь удалить чужую карточку'));
+        return;
+      }
+      card.remove().then(() => res.status(OK).send({ data: card }));
     })
     .catch(next);
 };

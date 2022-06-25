@@ -23,10 +23,6 @@ router.post(
 router.delete(
   '/:id',
   celebrate({
-    cookies: Joi.object().keys({
-      jwt: Joi.string().min(3).max(200)
-        .required(),
-    }).unknown(true),
     params: Joi.object().keys({
       id: Joi.string().hex().length(24),
     }),

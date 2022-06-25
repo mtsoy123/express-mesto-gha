@@ -10,7 +10,6 @@ const {
   DUPLICATE_ERROR,
   OK,
 } = require('../utils/errorStatuses');
-const Card = require('../models/card');
 
 const opts = { runValidators: true, new: true };
 
@@ -21,8 +20,7 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
-  const id = jwt.verify(req.cookies.jwt, 'secret-key');
-  User.findById(id)
+  User.findById(req.user._id)
     .then((users) => res.status(OK).send(users))
     .catch(next);
 };
@@ -71,58 +69,57 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
-  const userId = jwt.verify(req.cookies.jwt, 'secret-key')._id;
-  Card.find({ _id: userId })
-    .then((r) => {
-      if (!r) {
+  User.findByIdAndUpdate(req.user._id, { name, about }, opts)
+    .then((user) => {
+      if (!user) {
         next(new NotFoundErr('Пользователь по указанному _id не найден.'));
         return;
       }
-      User.findByIdAndUpdate(req.user._id, { name, about }, opts)
-        .then((user) => {
-          if (!user) {
-            next(new NotFoundErr('Пользователь по указанному _id не найден.'));
-            return;
-          }
 
-          res
-            .status(OK)
-            .send({
-              name: user.name,
-              about: user.about,
-              avatar: user.avatar,
-              _id: user._id,
-            });
+      res
+        .status(OK)
+        .send({
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          _id: user._id,
         });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestErr('Некорректный формат запроса'));
+        return;
+      }
+      next(err);
+    });
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  const userId = jwt.verify(req.cookies.jwt, 'secret-key')._id;
 
-  User.find({ _id: userId })
-    .then((r) => {
-      if (!r) {
+  User.findByIdAndUpdate(req.user._id, { avatar }, opts)
+    .then((user) => {
+      if (!user) {
         next(new NotFoundErr('Пользователь по указанному _id не найден.'));
         return;
       }
-      User.findByIdAndUpdate(req.user._id, { avatar }, opts)
-        .then((user) => {
-          if (!user) {
-            next(new NotFoundErr('Пользователь по указанному _id не найден.'));
-            return;
-          }
-          res.send({
-            name: user.name,
-            about: user.about,
-            avatar: user.avatar,
-            _id: user._id,
-          });
+      res
+        .status(OK)
+        .send({
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          _id: user._id,
         });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestErr('Некорректный формат запроса'));
+        return;
+      }
+
+      next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {
@@ -130,11 +127,6 @@ module.exports.login = (req, res, next) => {
 
   User.findUserByCred(email, password)
     .then((user) => {
-      if (!user) {
-        next(new NotFoundErr('Пользователь по указанному _id не найден.'));
-        return;
-      }
-
       const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
 
       res.cookie('jwt', token, {
