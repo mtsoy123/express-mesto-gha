@@ -39,14 +39,16 @@ app.post(
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
       avatar: Joi.string().regex(validateLink),
-      // eslint-disable-next-line max-len
-      // avatar: Joi.string().regex(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~://?#[\]@!$&'()*+,;=.]+/im),
       email: Joi.string().required().email(),
       password: Joi.string().required(),
     }),
   }),
   createUser,
 );
+
+/* app.get('/signout', (req, res) => {
+  res.clearCookie('jwt').send({ message: 'Выход' });
+}); */
 
 app.use(auth);
 

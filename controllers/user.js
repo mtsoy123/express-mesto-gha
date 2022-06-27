@@ -8,20 +8,19 @@ const ConflictErr = require('../utils/errors/ConflictErr');
 const {
   CREATED,
   DUPLICATE_ERROR,
-  OK,
 } = require('../utils/errorStatuses');
 
 const opts = { runValidators: true, new: true };
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(OK).send(users))
+    .then((users) => res.send(users))
     .catch(next);
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
-    .then((users) => res.status(OK).send(users))
+    .then((users) => res.send(users))
     .catch(next);
 };
 
@@ -77,7 +76,6 @@ module.exports.updateUserInfo = (req, res, next) => {
       }
 
       res
-        .status(OK)
         .send({
           name: user.name,
           about: user.about,
@@ -104,7 +102,6 @@ module.exports.updateUserAvatar = (req, res, next) => {
         return;
       }
       res
-        .status(OK)
         .send({
           name: user.name,
           about: user.about,
@@ -132,7 +129,7 @@ module.exports.login = (req, res, next) => {
       res.cookie('jwt', token, {
         httpOnly: true,
       });
-      res.status(OK).send({ token });
+      res.send({ token });
     })
     .catch(next);
 };
