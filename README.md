@@ -1,28 +1,33 @@
 [![Tests](https://github.com/mtsoy123/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/mtsoy123/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests](https://github.com/mtsoy123/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/mtsoy123/express-mesto-gha/actions/workflows/tests-14-sprint.yml)
-# Проект Mesto фронтенд + бэкенд
+
+# Проект Mesto. Бэкенд
+![logo](https://github.com/mtsoy123/react-mesto-auth/blob/main/src/images/logoDark.svg)
 
 
+## Запуск приложения
+`npm run start`
 
-## Настройка бейджей статуса тестов
-Перед началом работы над проектом рекомендуется исправить бейджи, отражающие статус прохождения тестов.
-Для этого замените разметку бейджей на следующий фрагмент, подставив вместо `${имя_пользователя}` и `${имя_репозитория}` соответствующие значения.
+## О проекте
+Бекенд для приложения Mesto. Mesto — приложение для публикации фотографий в общую ленту. Это учебный проект, в котором на практике поработал с фреймворками express.js, node.js и базами данных. В приложении реализована обработка запросов и ошибок. Роуты защищены авторизацией, пароль хешируется. Запросы вылидируются до передачи в контроллеры и в схеме базы данных
 
-```
-[![Tests for sprint 13](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-13-sprint.yml) 
+## Роутинг
+* POST /signin — авторизация пользователя
+* POST /signup — регистрация пользователя
+* GET /users — возвращает всех пользователей
+* GET /users/me - возвращает информацию о текущем пользователе
+* GET /users/:userId - возвращает пользователя по _id
+* GET /cards — возвращает все карточки
+* POST /cards — создаёт карточку
+* DELETE /cards/:cardId — удаляет карточку по идентификатору
+* PATCH /users/me — обновляет профиль
+* PATCH /users/me/avatar — обновляет аватар
+* PUT /cards/:cardId/likes — ставит лайк карточке
+* DELETE /cards/:cardId/likes — убирает лайк с карточки
 
-[![Tests for sprint 14](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/${имя_пользователя}/${имя репозитория}/actions/workflows/tests-14-sprint.yml)
-```
-
-
-## Директории
-
-`/routes` — папка с файлами роутера  
-`/controllers` — папка с файлами контроллеров пользователя и карточки   
-`/models` — папка с файлами описания схем пользователя и карточки  
-  
-Остальные директории вспомогательные, создаются при необходимости разработчиком
-
-## Запуск проекта
-
-`npm run start` — запускает сервер   
-`npm run dev` — запускает сервер с hot-reload
+## Технологии
+Node.js,
+Express.js,
+Mongodb,
+Mongoose,
+Joi,
+celebrate
