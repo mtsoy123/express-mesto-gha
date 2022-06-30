@@ -25,9 +25,9 @@
 * DELETE /cards/:cardId/likes — убирает лайк с карточки
 
 ## Технологии
-Node.js,
-Express.js,
-Mongodb,
-Mongoose,
-Joi,
-celebrate
+* Node.js
+* Express.js
+* Mongodb
+* Mongoose
+* Joi
+* celebrate
