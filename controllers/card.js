@@ -3,7 +3,7 @@ const NotFoundErr = require('../utils/errors/NotFoundErr');
 const ForbiddenErr = require('../utils/errors/ForbiddenErr');
 
 const {
-  CREATED, OK,
+  CREATED,
 } = require('../utils/errorStatuses');
 const BadRequestErr = require('../utils/errors/BadRequestErr');
 
@@ -36,7 +36,7 @@ module.exports.deleteCard = (req, res, next) => {
         next(new ForbiddenErr('Вы пытаетесь удалить чужую карточку'));
         return;
       }
-      card.remove().then(() => res.status(OK).send({ data: card }));
+      card.remove().then(() => res.send({ data: card }));
     })
     .catch(next);
 };
