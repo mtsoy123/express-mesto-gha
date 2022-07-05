@@ -10,6 +10,7 @@ const { login, createUser } = require('./controllers/user');
 const auth = require('./middlewares/auth');
 const NotFoundErr = require('./utils/errors/NotFoundErr');
 const validateLink = require('./utils/regex');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
 
@@ -20,6 +21,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(requestLogger);
 
 app.post(
   '/signin',
@@ -59,8 +61,9 @@ app.use((req, resб, next) => {
   next(new NotFoundErr('Страница не найдена'));
 });
 
-app.use(errors());
+app.use(errorLogger);
 
+app.use(errors());
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
